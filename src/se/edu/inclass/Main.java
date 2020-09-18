@@ -7,6 +7,8 @@ import se.edu.inclass.task.TaskNameComparator;
 
 import java.util.ArrayList;
 
+import static java.util.stream.Collectors.toList;
+
 public class Main {
 
     private TaskNameComparator taskNameComparator;
@@ -18,11 +20,13 @@ public class Main {
         System.out.println("Printing deadlines");
         printDeadlines(tasksData);
         System.out.println("Total number of deadlines: " + countDeadlines(tasksData));
+        printDeadlinesUsingStreams(tasksData);
+        for (Task t : filterByString(tasksData, "11")) {
+            System.out.println(t);
+        }
 
         printDataUsingStreams(tasksData);
-        printDeadlineUsingStreams(tasksData);
         System.out.println("Total Deadline: " + countDeadlinesUsingStreams(tasksData));
-
     }
 
     private static int countDeadlines(ArrayList<Task> tasksData) {
@@ -37,9 +41,7 @@ public class Main {
 
     public static int countDeadlinesUsingStreams(ArrayList<Task> tasksData) {
         System.out.println("Calculating count using streams");
-        return (int) tasksData.stream()
-                .filter((t) -> t instanceof Deadline)
-                .count();
+        return (int) tasksData.stream().filter((t) -> t instanceof Deadline).count();
     }
 
     public static void printData(ArrayList<Task> tasksData) {
@@ -50,8 +52,7 @@ public class Main {
 
     public static void printDataUsingStreams(ArrayList<Task> tasksData) {
         System.out.println("Printing data using streams");
-        tasksData.stream()
-                .forEach(System.out::println);
+        tasksData.stream().forEach(System.out::println);
 
     }
 
@@ -63,11 +64,16 @@ public class Main {
         }
     }
 
-    public static void printDeadlineUsingStreams(ArrayList<Task> tasksData) {
+    public static void printDeadlinesUsingStreams(ArrayList<Task> tasksData) {
         System.out.println("Printing deadlines using streams");
-        tasksData.stream()
-                .filter((t) -> t instanceof Deadline) //Extract all tasks that are deadline with predicates
-                .forEach(System.out::println);
+        tasksData.stream().filter((s) -> s instanceof Deadline).sorted((a, b) -> a.getDescription().toLowerCase().compareTo(b.getDescription().toLowerCase())).forEach(System.out::println);
+    }
+
+    public static ArrayList<Task> filterByString(ArrayList<Task> tasksData, String filterString) {
+        ArrayList<Task> filteredTaskList = (ArrayList<Task>) tasksData.stream().filter((s) -> s.getDescription().contains(filterString)) //Check description for the string
+                .collect(toList()); //Collect data and returns in list
+
+        return filteredTaskList;
     }
 
 }
